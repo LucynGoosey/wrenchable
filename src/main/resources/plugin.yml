@@ -1,0 +1,13 @@
+name: Wrenchable
+version: '${project.version}'
+main: io.github.rypofalem.wrenchable.Wrenchable
+api-version: 1.19
+prefix: wrenchable
+authors: [ rypofalem ]
+description: '${project.description}'
+commands:
+  wrenchable:
+    description: Your description
+    usage: "/<command> dump - dump a list of whitelistable blocks to plugins/wrenchable/dump.yml\n
+/<command> debugplatform - build a large platform with valid blocks to wrench. Dangerous - only use on test server"
+    permission: op

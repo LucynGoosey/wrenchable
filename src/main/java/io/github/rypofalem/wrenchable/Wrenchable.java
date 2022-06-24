@@ -1,0 +1,104 @@
+package io.github.rypofalem.wrenchable;
+
+import io.github.rypofalem.wrenchable.cyclable.CyclableDirectional;
+import io.github.rypofalem.wrenchable.cyclable.CyclableOrientable;
+import io.github.rypofalem.wrenchable.cyclable.CyclableRotatable;
+import org.bukkit.*;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Orientable;
+import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.data.type.Piston;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
+public final class Wrenchable extends JavaPlugin implements Listener {
+    private final ItemStack wrench = new ItemStack(Material.CARROT_ON_A_STICK);
+    {
+        Damageable meta = (Damageable) wrench.getItemMeta();
+        meta.setDisplayName("Wrench");
+        meta.setDamage(1);
+        meta.setUnbreakable(true);
+        wrench.setItemMeta(meta);
+    }
+    private final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
+    private final ShapedRecipe wrenchRecipe = new ShapedRecipe(wrenchKey, wrench);
+    {
+        wrenchRecipe.shape(" G ", " GG", "I  ");
+        wrenchRecipe.setIngredient('G', Material.GOLD_INGOT);
+        wrenchRecipe.setIngredient('I', Material.IRON_INGOT);
+    }
+    private final Set<Material> whitelist = new HashSet<>();
+
+    @Override
+    public void onEnable() {
+        getServer().getPluginManager().registerEvents(this, this);
+        getServer().addRecipe(wrenchRecipe);
+        getCommand("wrenchable").setExecutor(new WrenchableCommand(this));
+
+        // load whitelist
+        saveDefaultConfig();
+        List<String> materialStrings = getConfig().getStringList("whitelist");
+        for(String str : materialStrings) {
+            Material mat = Material.matchMaterial(str);
+            if(mat == null)
+                getLogger().log(Level.WARNING, "could not add '%s' to whitelist because it doesn't match a known material".formatted(str));
+            else if (!(mat.createBlockData() instanceof Directional || mat.createBlockData() instanceof Rotatable || mat.createBlockData() instanceof Orientable))
+                getLogger().log(Level.WARNING, "'%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched");
+            else whitelist.add(mat);
+        }
+
+    }
+
+    public boolean isWrench(ItemStack item){
+        return item != null &&
+                item.getType() == Material.CARROT_ON_A_STICK &&
+                item.hasItemMeta() &&
+                item.getItemMeta().isUnbreakable() &&
+                ((Damageable) item.getItemMeta()).getDamage() == 1;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        // reasons to ignore the event
+        if (    e.getAction() != Action.RIGHT_CLICK_BLOCK ||
+                e.getClickedBlock() == null ||
+                e.getHand() != EquipmentSlot.HAND ||
+                !isWrench(e.getItem()) ||
+                !whitelist.contains(e.getClickedBlock().getType())
+        ) return;
+        // don't mess with double chest
+        if(e.getClickedBlock().getState() instanceof Chest &&
+                ((Chest)e.getClickedBlock().getState()).getInventory().getHolder() instanceof DoubleChest) return;
+        // don't mess with extended pistons
+        if(e.getClickedBlock().getBlockData() instanceof Piston &&
+                ((Piston)e.getClickedBlock().getBlockData()).isExtended()) return;
+
+
+        // cycle block data if it implements the correct interfaces
+        BlockData blockData = e.getClickedBlock().getBlockData();
+        if(blockData instanceof Directional directional) new CyclableDirectional(directional).cycle();
+        else if(blockData instanceof Rotatable rotatable) new CyclableRotatable(rotatable).cycle();
+        else if(blockData instanceof Orientable orientable) new CyclableOrientable(orientable).cycle();
+        else return;
+
+        // apply the operation to the world
+        e.getClickedBlock().setBlockData(blockData);
+        e.setUseInteractedBlock(Event.Result.DENY); // Don't interact with the block
+        e.setCancelled(true);
+        e.getClickedBlock().getWorld().playSound(e.getClickedBlock().getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.PLAYERS, 1, .5f);
+    }
+}
