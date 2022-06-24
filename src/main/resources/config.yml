@@ -50,7 +50,7 @@ whitelist:
   - END_ROD
   - PURPUR_PILLAR
   - PURPUR_STAIRS
-#  - CHEST requires special code so it doesn't rotate double chests
+  - CHEST # plugin won't attempt to rotate doublechests
   - FURNACE
 #  - LADDER # wall hanging
   - COBBLESTONE_STAIRS
@@ -144,8 +144,8 @@ whitelist:
   - DEEPSLATE_TILE_STAIRS
   - REPEATER
   - COMPARATOR
-  - PISTON
-  - STICKY_PISTON
+  - PISTON # plugin won't attempt to rotate extended pistons
+  - STICKY_PISTON # plugin won't attempt to rotate extended pistons
   - OBSERVER
   - HOPPER
   - DISPENSER
