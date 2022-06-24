@@ -99,6 +99,6 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         e.getClickedBlock().setBlockData(blockData);
         e.setUseInteractedBlock(Event.Result.DENY); // Don't interact with the block
         e.setCancelled(true);
-        e.getClickedBlock().getWorld().playSound(e.getClickedBlock().getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.PLAYERS, 1, .5f);
+        e.getClickedBlock().getWorld().playSound(e.getClickedBlock().getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.BLOCKS, 1, .5f);
     }
 }
