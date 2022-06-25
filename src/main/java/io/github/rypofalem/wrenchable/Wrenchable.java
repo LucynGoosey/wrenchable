@@ -57,7 +57,8 @@ public final class Wrenchable extends JavaPlugin implements Listener {
             if(mat == null)
                 getLogger().log(Level.WARNING, "could not add '%s' to whitelist because it doesn't match a known material".formatted(str));
             else if (!(mat.createBlockData() instanceof Directional || mat.createBlockData() instanceof Rotatable || mat.createBlockData() instanceof Orientable))
-                getLogger().log(Level.WARNING, "'%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched");
+                getLogger().log(Level.WARNING,
+                        "Whitelisted material '%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched".formatted(str));
             else whitelist.add(mat);
         }
 
@@ -93,7 +94,12 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         if(blockData instanceof Directional directional) new CyclableDirectional(directional).cycle();
         else if(blockData instanceof Rotatable rotatable) new CyclableRotatable(rotatable).cycle();
         else if(blockData instanceof Orientable orientable) new CyclableOrientable(orientable).cycle();
-        else return;
+        else {
+            // normally should be unreachable because we already check if whitelisted blocks implement the interface
+            // before they are added to the whitelist.  Including this just in case.
+            getLogger().log(Level.WARNING, "Whitelisted material '%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched".formatted(blockData.getMaterial().toString()));
+            return;
+        }
 
         // apply the operation to the world
         e.getClickedBlock().setBlockData(blockData);
