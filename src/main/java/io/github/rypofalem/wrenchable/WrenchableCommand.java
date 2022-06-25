@@ -27,8 +27,8 @@ public class WrenchableCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if(args == null || args.length < 1) return false;
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if(args.length < 1) return false;
         // dump a list of wrenchable blocks
         if (!"dump".equals(args[0])) return false;
         List<String> names = validBlocks().map(Enum::name).toList();
