@@ -11,6 +11,7 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Orientable;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.block.data.type.Piston;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,6 +30,7 @@ public final class Wrenchable extends JavaPlugin implements Listener {
     private final ItemStack wrench = new ItemStack(Material.CARROT_ON_A_STICK);
     {
         Damageable meta = (Damageable) wrench.getItemMeta();
+        assert meta != null;
         meta.setDisplayName("Wrench");
         meta.setDamage(1);
         meta.setUnbreakable(true);
@@ -47,7 +49,9 @@ public final class Wrenchable extends JavaPlugin implements Listener {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().addRecipe(wrenchRecipe);
-        getCommand("wrenchable").setExecutor(new WrenchableCommand(this));
+        PluginCommand cmd= getCommand("wrenchable");
+        if(cmd != null) cmd.setExecutor(new WrenchableCommand(this));
+        else getLogger().warning("The command /wrenchable doesn't seem to be registered properly and won't work.");
 
         // load whitelist
         saveDefaultConfig();
@@ -67,7 +71,7 @@ public final class Wrenchable extends JavaPlugin implements Listener {
     public boolean isWrench(ItemStack item){
         return item != null &&
                 item.getType() == Material.CARROT_ON_A_STICK &&
-                item.hasItemMeta() &&
+                item.getItemMeta() != null &&
                 item.getItemMeta().isUnbreakable() &&
                 ((Damageable) item.getItemMeta()).getDamage() == 1;
     }

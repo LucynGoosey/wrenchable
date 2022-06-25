@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,43 +27,39 @@ public class WrenchableCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(args.length < 1) return false;
-        switch (args[0]){
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if(args == null || args.length < 1) return false;
+        // dump a list of wrenchable blocks
+        if (!"dump".equals(args[0])) return false;
+        List<String> names = validBlocks().map(Enum::name).toList();
 
-            // dump a list of wrenchable blocks
-            case "dump":
-                List<String> names = validBlocks().map(Enum::name).toList();
-
-                File dumpFile = new File(plugin.getDataFolder(), "dump.yml");
-                if (!dumpFile.exists()) {
-                    dumpFile.getParentFile().mkdirs();
-                    plugin.saveResource("dump.yml", true);
-                }
-
-                FileConfiguration dump = new YamlConfiguration();
-                try {
-                    dump.load(dumpFile);
-                } catch (IOException | InvalidConfigurationException e) {
-                    e.printStackTrace();
-                    return true;
-                }
-
-                dump.set("dump", names);
-                try {
-                    dump.save(dumpFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return true;
-            default: return false;
+        File dumpFile = new File(plugin.getDataFolder(), "dump.yml");
+        if (!dumpFile.exists()) {
+            dumpFile.getParentFile().mkdirs();
+            plugin.saveResource("dump.yml", true);
         }
+
+        FileConfiguration dump = new YamlConfiguration();
+        try {
+            dump.load(dumpFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+            return true;
+        }
+
+        dump.set("dump", names);
+        try {
+            dump.save(dumpFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     private Stream<Material> validBlocks(){
         return Arrays.stream(Material.values()).filter(
                 m -> !m.name().contains("LEGACY") && m.isBlock()
-                && (m.createBlockData() instanceof Directional || m.createBlockData() instanceof Orientable || m.createBlockData() instanceof Rotatable)
+                        && (m.createBlockData() instanceof Directional || m.createBlockData() instanceof Orientable || m.createBlockData() instanceof Rotatable)
         );
     }
 }
