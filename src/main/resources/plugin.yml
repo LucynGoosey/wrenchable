@@ -8,6 +8,5 @@ description: '${project.description}'
 commands:
   wrenchable:
     description: Your description
-    usage: "/<command> dump - dump a list of whitelistable blocks to plugins/wrenchable/dump.yml\n
-/<command> debugplatform - build a large platform with valid blocks to wrench. Dangerous - only use on test server"
+    usage: "/<command> dump - dump a list of whitelistable blocks to plugins/wrenchable/dump.yml"
     permission: op
