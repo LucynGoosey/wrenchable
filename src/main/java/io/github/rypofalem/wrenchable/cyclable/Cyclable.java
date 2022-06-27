@@ -9,13 +9,13 @@ import java.util.Set;
 public interface Cyclable<Holder, Orientation> {
 
     // todo: cycle gets stuck if there are duplicate entries. not an issue for this project but more generally should be looked at
-    default Holder cycle(){
+    default Holder cycle() {
         Optional<Orientation> orientation = CircularIterator.findAfter(
                 getOrdering(),
                 f -> getOrientation().equals(f),
                 f -> getValidPositions().contains(f));
 
-        if(orientation.isEmpty())
+        if (orientation.isEmpty())
             // we failed to find a valid replacement face.
             // this should only happen if there are no valid faces in the array (API changed or bugged)
             throw new IllegalStateException("Couldn't find an appropriate facing to rotate to.\n");

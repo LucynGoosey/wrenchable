@@ -8,15 +8,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CyclableRotatable implements Cyclable<Rotatable, BlockFace> {
-    private final Rotatable rotatable;
     private static final BlockFace[] orderedRotations = {
             BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST,
             BlockFace.EAST_NORTH_EAST, BlockFace.EAST, BlockFace.EAST_SOUTH_EAST,
             BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST,
             BlockFace.WEST_SOUTH_WEST, BlockFace.WEST, BlockFace.WEST_NORTH_WEST
     };
+    private final Rotatable rotatable;
 
-    public CyclableRotatable(Rotatable r){
+    public CyclableRotatable(Rotatable r) {
         this.rotatable = r;
     }
 

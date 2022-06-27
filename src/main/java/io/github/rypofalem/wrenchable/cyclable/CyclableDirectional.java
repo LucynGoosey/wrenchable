@@ -7,7 +7,6 @@ import java.util.Set;
 
 public class CyclableDirectional implements Cyclable<Directional, BlockFace> {
 
-    private final Directional directional;
     private static final BlockFace[] orderedDirections = {
             BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST,
             BlockFace.EAST_NORTH_EAST, BlockFace.EAST, BlockFace.EAST_SOUTH_EAST,
@@ -15,6 +14,7 @@ public class CyclableDirectional implements Cyclable<Directional, BlockFace> {
             BlockFace.WEST_SOUTH_WEST, BlockFace.WEST, BlockFace.WEST_NORTH_WEST,
             BlockFace.UP, BlockFace.DOWN
     };
+    private final Directional directional;
 
     public CyclableDirectional(Directional directional) {
         this.directional = directional;

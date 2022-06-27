@@ -28,7 +28,7 @@ public class WrenchableCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(args.length < 1) return false;
+        if (args.length < 1) return false;
         // dump a list of wrenchable blocks
         if (!"dump".equals(args[0])) return false;
         List<String> names = validBlocks().map(Enum::name).toList();
@@ -56,7 +56,7 @@ public class WrenchableCommand implements CommandExecutor {
         return true;
     }
 
-    private Stream<Material> validBlocks(){
+    private Stream<Material> validBlocks() {
         return Arrays.stream(Material.values()).filter(
                 m -> !m.name().contains("LEGACY") && m.isBlock()
                         && (m.createBlockData() instanceof Directional || m.createBlockData() instanceof Orientable || m.createBlockData() instanceof Rotatable)
