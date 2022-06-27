@@ -73,6 +73,7 @@ public final class Wrenchable extends JavaPlugin implements Listener {
                 item.getType() == Material.CARROT_ON_A_STICK &&
                 item.getItemMeta() != null &&
                 item.getItemMeta().isUnbreakable() &&
+                item.getItemMeta() instanceof Damageable &&
                 ((Damageable) item.getItemMeta()).getDamage() == 1;
     }
 
