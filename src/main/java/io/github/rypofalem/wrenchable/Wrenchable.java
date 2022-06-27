@@ -28,14 +28,6 @@ import java.util.logging.Level;
 
 public final class Wrenchable extends JavaPlugin implements Listener {
     private final ItemStack wrench = new ItemStack(Material.CARROT_ON_A_STICK);
-    {
-        Damageable meta = (Damageable) wrench.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName("Wrench");
-        meta.setDamage(1);
-        meta.setUnbreakable(true);
-        wrench.setItemMeta(meta);
-    }
     private final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
     private final ShapedRecipe wrenchRecipe = new ShapedRecipe(wrenchKey, wrench);
     {
@@ -47,9 +39,21 @@ public final class Wrenchable extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        // set wrench properties
+        if(wrench.getItemMeta() == null || !(wrench.getItemMeta() instanceof Damageable damageableMeta)){
+            getLogger().warning("Something fundamental about the wrench item seems to have changed and the Wrenchable plugin will not function correctly. Disabling Wrenchable.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        damageableMeta.setDisplayName("Wrench");
+        damageableMeta.setDamage(1);
+        damageableMeta.setUnbreakable(true);
+        wrench.setItemMeta(damageableMeta);
+
+        // register our stuff
         getServer().getPluginManager().registerEvents(this, this);
         getServer().addRecipe(wrenchRecipe);
-        PluginCommand cmd= getCommand("wrenchable");
+        PluginCommand cmd = getCommand("wrenchable");
         if(cmd != null) cmd.setExecutor(new WrenchableCommand(this));
         else getLogger().warning("The command /wrenchable doesn't seem to be registered properly and won't work.");
 
@@ -65,7 +69,6 @@ public final class Wrenchable extends JavaPlugin implements Listener {
                         "Whitelisted material '%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched".formatted(str));
             else whitelist.add(mat);
         }
-
     }
 
     public boolean isWrench(ItemStack item){
