@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -29,6 +30,7 @@ import java.util.Set;
 
 public final class Wrenchable extends JavaPlugin implements Listener {
     private final Set<Material> whitelist = new HashSet<>();
+    private final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
 
     @Override
     public void onEnable() {
@@ -47,7 +49,6 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         wrench.setItemMeta(damageableMeta);
 
         // setup crafting recipe
-        final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
         final ShapedRecipe wrenchRecipe = new ShapedRecipe(wrenchKey, wrench);
         wrenchRecipe.shape(" G ", " GG", "I  ");
         wrenchRecipe.setIngredient('G', Material.GOLD_INGOT);
@@ -118,5 +119,10 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         e.setUseInteractedBlock(Event.Result.DENY); // Don't interact with the block
         e.setCancelled(true);
         e.getClickedBlock().getWorld().playSound(e.getClickedBlock().getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.BLOCKS, 1, .5f);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        e.getPlayer().discoverRecipe(wrenchKey);
     }
 }
