@@ -28,19 +28,12 @@ import java.util.List;
 import java.util.Set;
 
 public final class Wrenchable extends JavaPlugin implements Listener {
-    private final ItemStack wrench = new ItemStack(Material.CARROT_ON_A_STICK);
-    private final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
     private final Set<Material> whitelist = new HashSet<>();
-    private final ShapedRecipe wrenchRecipe = new ShapedRecipe(wrenchKey, wrench);
-    {
-        wrenchRecipe.shape(" G ", " GG", "I  ");
-        wrenchRecipe.setIngredient('G', Material.GOLD_INGOT);
-        wrenchRecipe.setIngredient('I', Material.IRON_INGOT);
-    }
 
     @Override
     public void onEnable() {
         // set wrench properties
+        final ItemStack wrench = new ItemStack(Material.CARROT_ON_A_STICK);
         if (wrench.getItemMeta() == null || !(wrench.getItemMeta() instanceof Damageable damageableMeta)) {
             // normally unreachable, shut down the plugin if the api changed so significantly that the wrench can't
             // be setup properly
@@ -53,6 +46,13 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         damageableMeta.setUnbreakable(true);
         wrench.setItemMeta(damageableMeta);
 
+        // setup crafting recipe
+        final NamespacedKey wrenchKey = new NamespacedKey(this, "wrench");
+        final ShapedRecipe wrenchRecipe = new ShapedRecipe(wrenchKey, wrench);
+        wrenchRecipe.shape(" G ", " GG", "I  ");
+        wrenchRecipe.setIngredient('G', Material.GOLD_INGOT);
+        wrenchRecipe.setIngredient('I', Material.IRON_INGOT);
+
         // register our stuff
         getServer().getPluginManager().registerEvents(this, this);
         getServer().addRecipe(wrenchRecipe);
@@ -61,6 +61,7 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         else getLogger().warning("The command /wrenchable doesn't seem to be registered properly and won't work.");
 
         // load whitelist
+        whitelist.clear();
         saveDefaultConfig();
         List<String> materialStrings = getConfig().getStringList("whitelist");
         for (String str : materialStrings) {
