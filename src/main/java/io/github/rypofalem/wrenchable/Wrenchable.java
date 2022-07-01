@@ -4,6 +4,7 @@ import io.github.rypofalem.wrenchable.cyclable.CyclableDirectional;
 import io.github.rypofalem.wrenchable.cyclable.CyclableOrientable;
 import io.github.rypofalem.wrenchable.cyclable.CyclableRotatable;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.data.BlockData;
@@ -14,8 +15,10 @@ import org.bukkit.block.data.type.Piston;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -101,7 +104,6 @@ public final class Wrenchable extends JavaPlugin implements Listener {
         if (e.getClickedBlock().getBlockData() instanceof Piston &&
                 ((Piston) e.getClickedBlock().getBlockData()).isExtended()) return;
 
-
         // cycle block data if it implements the correct interfaces
         BlockData blockData = e.getClickedBlock().getBlockData();
         if (blockData instanceof Directional directional) new CyclableDirectional(directional).cycle();
@@ -111,6 +113,22 @@ public final class Wrenchable extends JavaPlugin implements Listener {
             // normally should be unreachable because we already check if whitelisted blocks implement the interface
             // before they are added to the whitelist.  Including this just in case.
             getLogger().warning("Whitelisted material '%s' doesn't implement Directional, Rotatable or Orientable so cannot be wrenched".formatted(blockData.getMaterial().toString()));
+            return;
+        }
+
+        // Fire event to ask permission for the block change and to allow plugins to log the block change
+        BlockPlaceEvent bpe = new BlockPlaceEvent(
+                e.getClickedBlock(),
+                e.getClickedBlock().getState(),
+                e.getClickedBlock(),
+                e.getItem(),
+                e.getPlayer(),
+                true,
+                e.getHand()
+        );
+        Bukkit.getPluginManager().callEvent(bpe);
+        if(bpe.isCancelled()) {
+            e.setCancelled(true);
             return;
         }
 
