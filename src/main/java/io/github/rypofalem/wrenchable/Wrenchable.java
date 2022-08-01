@@ -103,10 +103,11 @@ public final class Wrenchable extends JavaPlugin implements Listener {
                 ((Piston) e.getClickedBlock().getBlockData()).isExtended()) return;
 
         // cycle block data if it implements the correct interfaces
+        boolean reverse = e.getPlayer().isSneaking();
         BlockData blockData = e.getClickedBlock().getBlockData();
-        if (blockData instanceof Directional directional) new CyclableDirectional(directional).cycle();
-        else if (blockData instanceof Rotatable rotatable) new CyclableRotatable(rotatable).cycle();
-        else if (blockData instanceof Orientable orientable) new CyclableOrientable(orientable).cycle();
+        if (blockData instanceof Directional directional) new CyclableDirectional(directional).cycle(reverse);
+        else if (blockData instanceof Rotatable rotatable) new CyclableRotatable(rotatable).cycle(reverse);
+        else if (blockData instanceof Orientable orientable) new CyclableOrientable(orientable).cycle(reverse);
         else {
             // normally should be unreachable because we already check if whitelisted blocks implement the interface
             // before they are added to the whitelist.  Including this just in case.

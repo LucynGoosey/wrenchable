@@ -1,5 +1,7 @@
 package io.github.rypofalem.wrenchable.cyclable;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -9,11 +11,18 @@ import java.util.Set;
 public interface Cyclable<Holder, Orientation> {
 
     // todo: cycle gets stuck if there are duplicate entries. not an issue for this project but more generally should be looked at
-    default Holder cycle() {
+    default Holder cycle(boolean reverse) {
+        Orientation[] order;
+        if(reverse){
+            Orientation[] a = getOrdering().clone();
+            Collections.reverse(Arrays.asList(a));
+            order = a;
+        } else order = getOrdering();
+
         Optional<Orientation> orientation = CircularIterator.findAfter(
-                getOrdering(),
-                f -> getOrientation().equals(f),
-                f -> getValidPositions().contains(f));
+                    order,
+                    f -> getOrientation().equals(f),
+                    f -> getValidPositions().contains(f));
 
         if (orientation.isEmpty())
             // we failed to find a valid replacement face.
