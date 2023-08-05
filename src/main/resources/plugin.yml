@@ -1,7 +1,7 @@
 name: Wrenchable
 version: '${project.version}'
 main: io.github.rypofalem.wrenchable.Wrenchable
-api-version: 1.19
+api-version: 1.20
 prefix: wrenchable
 authors: [ rypofalem ]
 description: '${project.description}'
